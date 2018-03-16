@@ -254,7 +254,7 @@ std::ostream& operator<<(std::ostream& outDev, const BigInt& num)
 	return outDev;
 }
 
-BigInt operator>>(BigInt num, int shift)
+BigInt operator>>(BigInt num, int shift)	// Phú code
 {
 	unsigned char carry = 0x00;
 	unsigned char fill_value = 0x00;
@@ -293,3 +293,96 @@ BigInt operator>>(BigInt num, int shift)
 	return num;
 }
 
+// HÀM >> và << NHẬT CODE
+char Nho_Bit_Dich_Phai(char a, int shift) {
+	char tmp = 0;
+	int t = 0, s = shift;
+	while (shift != t) {
+		tmp = (tmp << 1);
+		tmp = tmp | ((a >> (s - 1)) & 1);
+		s--; t++;
+	}
+	return (tmp << (8 - shift));
+}
+BigInt operator >> (BigInt num, int shift) {
+	while (shift > 8) {
+		char tmp = Nho_Bit_Dich_Phai(num.m_bits[MAX_BYTES - 1], 8);
+
+		if ((num.m_bits[MAX_BYTES - 1] >> 7) & 1 == 1) {
+			int d = 8;
+			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> 8;
+			while (1) {
+				if (d <= 0)break;
+				num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] | (1 << (8 - d));
+				d--;
+			}
+		}
+		else {
+			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> 8;
+		}
+		for (int i = MAX_BYTES - 2; i >= 0; i--) {
+			char nho_byte_truoc = num.m_bits[i];
+			num.m_bits[i] = (num.m_bits[i] >> 8) | tmp;
+			tmp = Nho_Bit_Dich_Phai(nho_byte_truoc, 8);
+		}
+		shift -= 8;
+	}
+
+	char tmp = Nho_Bit_Dich_Phai(num.m_bits[MAX_BYTES - 1], shift);
+	if ((num.m_bits[MAX_BYTES - 1] >> 7) & 1 == 1) {
+		int d = shift;
+		num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> shift;
+		while (1) {
+			if (d <= 0)break;
+			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] | (1 << (8 - d));
+			d--;
+		}
+	}
+	else {
+		num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> shift;
+	}
+	for (int i = MAX_BYTES - 2; i >= 0; i--) {
+		char nho_byte_truoc = num.m_bits[i];
+		num.m_bits[i] = (num.m_bits[i] >> shift) | tmp;
+		tmp = Nho_Bit_Dich_Phai(nho_byte_truoc, shift);
+	}
+	return num;
+}
+
+
+
+char Nho_Bit_Dich_Trai(char a, int shift)
+{
+	char tmp = 0;
+	int t = 0, s = 7;
+	while (shift != t) {
+		tmp = tmp << 1;
+		tmp = tmp | (a >> (s) & 1);
+		s--; t++;
+	}
+	return tmp;
+}
+BigInt operator << (BigInt num, int shift)
+{
+
+	while (shift > 8) {
+		char tmp = 0;
+		int i = MAX_BYTES - 2;
+		for (; i >= 0; i--)
+		{
+			tmp = Nho_Bit_Dich_Trai(num.m_bits[i], 8);
+			num.m_bits[i + 1] = (num.m_bits[i + 1] << 8) | tmp;
+		}
+		num.m_bits[0] = num.m_bits[0] << 8;
+		shift -= 8;
+	}
+	char tmp = 0;
+	int i = MAX_BYTES - 2;
+	for (; i >= 0; i--)
+	{
+		tmp = Nho_Bit_Dich_Trai(num.m_bits[i], shift);
+		num.m_bits[i + 1] = (num.m_bits[i + 1] << shift) | tmp;
+	}
+	num.m_bits[0] = num.m_bits[0] << shift;
+	return num;
+}

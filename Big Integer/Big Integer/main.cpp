@@ -57,8 +57,10 @@ void main()
 		int shift =  uid(func);
 		//int shift = rand() % 128 + 1;
 		int num = std::stoi(dec_string);
-		std::string res = (BigInt(dec_string) >> shift).get_dec_string();
-		num = num >> shift;
+	//	std::string res = (BigInt(dec_string) >> shift).get_dec_string();		// TOÁN TỬ >>
+		std::string res = (BigInt(dec_string) << shift).get_dec_string();		// TOÁN TỬ <<
+	//	num = num >> shift;
+		num = num << shift;
 		if (res != std::to_string(num))
 		{
 			std::cout << dec_string << std::endl;
