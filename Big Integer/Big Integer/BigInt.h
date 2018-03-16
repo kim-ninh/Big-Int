@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <regex>
 #include <bitset>
+#include <exception>
 
 #define MAX_BYTES 16
 // chiều dài chuỗi số lớn nhất có thể biễu diễn được của BigInt

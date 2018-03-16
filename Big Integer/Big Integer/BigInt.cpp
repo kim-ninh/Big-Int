@@ -263,6 +263,18 @@ Thực hiện phép tính: Q / M, kết quả trả về lưu trong biến Q
 
 BigInt operator/(const BigInt & lhs, const BigInt & rhs)
 {
+	bool isZero = true;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		if (rhs.m_bits[i] != 0)
+		{
+			isZero = false;
+			break;
+		}
+	}
+	if (isZero)
+		throw std::exception("Cann't not divide by zero");
+
 	BigInt A, Q, M;
 	int k = MAX_BYTES * 8;
 	Q = lhs;
