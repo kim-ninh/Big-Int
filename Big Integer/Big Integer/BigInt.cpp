@@ -254,3 +254,50 @@ std::ostream& operator<<(std::ostream& outDev, const BigInt& num)
 	return outDev;
 }
 
+/*
+Hàm chia 2 số BigInt với nhau
+Có sử dụng đến toán tử dịch bit (<<) và toán tử (-) trong thuật toán
+Kiểu trả về là Bigint
+Thực hiện phép tính: Q / M, kết quả trả về lưu trong biến Q
+*/
+
+BigInt operator/(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt A, Q, M;
+	int k = MAX_BYTES * 8;
+	Q = lhs;
+	M = rhs;
+
+	//Xác định Q âm hay dương
+	if ((Q.m_bits[MAX_BYTES - 1] >> 7) & 1)
+	{
+		for (int i = 0; i < MAX_BYTES; i++)
+			A.m_bits[i] = 0xFF;
+	}	
+	else
+	{
+		for (int i = 0; i < MAX_BYTES; i++)
+			A.m_bits[i] = 0;
+	}
+
+	while (k)
+	{
+		//Dịch trái từng bit trên mảng bit [A, Q]
+		unsigned char msbQ = Q.m_bits[MAX_BYTES - 1] >> 7;
+		A << 1;
+		A.m_bits[0] = A.m_bits[0] | msbQ;
+		Q << 1;
+
+		//KT A âm hay dương
+		A = A - M;
+		if ((A.m_bits[MAX_BYTES - 1] >> 7) & 1)
+		{
+			Q.m_bits[0] = Q.m_bits[0] & (~1);	//Tắt bit 0 (Q0 = 0)
+			A = A + M;
+		}
+		else
+			Q.m_bits[0] = Q.m_bits[0] | 1;		//Bật bit 0 (Q0 = 1)
+		k--;
+	}
+	return Q;
+}
