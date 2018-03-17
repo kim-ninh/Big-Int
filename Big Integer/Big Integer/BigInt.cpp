@@ -386,3 +386,34 @@ BigInt operator << (BigInt num, int shift)
 	num.m_bits[0] = num.m_bits[0] << shift;
 	return num;
 }
+
+BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
+{
+	BigInt kq;
+	using WORD = unsigned short;
+	using BYTE = unsigned char;
+	BigInt Bu_2;
+
+	// Bù 1 của số rhs
+	for (int i = 0; i < MAX_BYTES - 1; i++) {
+		Bu_2.m_bits[i] = ~(rhs.m_bits[i]);
+	}
+
+	// Bù 2 = Bù 1 + 1 của số rhs
+	BYTE Nho = 1;
+	for (int i = 0; i <MAX_BYTES; i++) {
+		WORD tmp1 = Bu_2.m_bits[i] + Nho;
+		Bu_2.m_bits[i] = tmp1;
+		Nho = tmp1 / (UCHAR_MAX + 1);
+	}
+
+
+	// Cộng lsh với bù 2 của rhs
+	BYTE carry = 0x00;
+	for (int i = 0; i <MAX_BYTES; i++) {
+		WORD tmp2 = lhs.m_bits[i] + Bu_2.m_bits[i] + carry;
+		kq.m_bits[i] = tmp2;
+		carry = tmp2 / (UCHAR_MAX + 1);
+	}
+	return kq;
+}
