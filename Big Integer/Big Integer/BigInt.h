@@ -7,6 +7,8 @@
 #include <bitset>
 
 #define MAX_BYTES 16
+#define BigIntMAX  "170141183460469231731687303715884105727"		// 2^127 - 1
+#define BigIntMIN "-170141183460469231731687303715884105728"		//-2^127
 // chiều dài chuỗi số lớn nhất có thể biễu diễn được của BigInt
 #define MAX_DEC_DIGITS ((std::to_string(pow(2, MAX_BYTES * 8 - 1) - 1.0).length()) - 7)
 
@@ -40,7 +42,7 @@ public:
 	friend BigInt operator >> (BigInt num, int shift);
 
 	//test
-	void ShowBit() const;
+	void ShowBit(std::ostream &os) const;
 };
 
 std::string ConvertBase(std::string number, int old_base, int new_base);

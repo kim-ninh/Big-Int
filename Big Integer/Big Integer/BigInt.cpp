@@ -232,10 +232,10 @@ BigInt::BigInt(std::string dec_string)
 	set_bit(dec_string);
 }
 
-void BigInt::ShowBit() const
+void BigInt::ShowBit(std::ostream &os) const
 {  
 	for (int i = MAX_BYTES - 1; i >= 0; --i)
-		std::cout << std::bitset<8>(*const_cast<unsigned char*>(m_bits + i)) << "  ";
+		os << std::bitset<8>(*const_cast<unsigned char*>(m_bits + i)) << "  ";
 }
 
 std::istream& operator>>(std::istream& inDev, BigInt& num)
@@ -254,44 +254,44 @@ std::ostream& operator<<(std::ostream& outDev, const BigInt& num)
 	return outDev;
 }
 
-BigInt operator>>(BigInt num, int shift)	// Phú code
-{
-	unsigned char carry = 0x00;
-	unsigned char fill_value = 0x00;
-	const bool negative = num.m_bits[MAX_BYTES - 1] >> 7;		// kiểm tra số âm
-
-	const int n_byte_shift = shift / CHAR_BIT;
-	shift %= 8;
-
-	if (negative)
-	{
-		carry = (0x7f >> (7 - shift)) & 0xff;		// carry = 
-		fill_value = UCHAR_MAX;
-	}
-
-	// dịch shift/8 đơn vị byte
-	if (n_byte_shift > 0)
-	{
-		memcpy(num.m_bits, num.m_bits + n_byte_shift, (MAX_BYTES - n_byte_shift) * sizeof(char));
-		memset(num.m_bits + MAX_BYTES - n_byte_shift, fill_value, n_byte_shift * sizeof(char));
-	}
-
-	// dịch (shift % 8) đơn vị bit
-	if (shift > 0)
-	{
-		for (int i = MAX_BYTES - 1; i >= 0; --i)
-		{
-			// nhớ các bit được dịch sang byte phía sau
-			unsigned char temp = (num.m_bits[i] << (CHAR_BIT - shift)) >> (CHAR_BIT - shift);
-			// dịch byte hiện tại
-			num.m_bits[i] >>= shift;
-			num.m_bits[i] |= carry << (CHAR_BIT - shift);
-			carry = temp;
-		}
-	}
-
-	return num;
-}
+//BigInt operator>>(BigInt num, int shift)	// Phú code
+//{
+//	unsigned char carry = 0x00;
+//	unsigned char fill_value = 0x00;
+//	const bool negative = num.m_bits[MAX_BYTES - 1] >> 7;		// kiểm tra số âm
+//
+//	const int n_byte_shift = shift / CHAR_BIT;
+//	shift %= 8;
+//
+//	if (negative)
+//	{
+//		carry = (0x7f >> (7 - shift)) & 0xff;		// carry = 
+//		fill_value = UCHAR_MAX;
+//	}
+//
+//	// dịch shift/8 đơn vị byte
+//	if (n_byte_shift > 0)
+//	{
+//		memcpy(num.m_bits, num.m_bits + n_byte_shift, (MAX_BYTES - n_byte_shift) * sizeof(char));
+//		memset(num.m_bits + MAX_BYTES - n_byte_shift, fill_value, n_byte_shift * sizeof(char));
+//	}
+//
+//	// dịch (shift % 8) đơn vị bit
+//	if (shift > 0)
+//	{
+//		for (int i = MAX_BYTES - 1; i >= 0; --i)
+//		{
+//			// nhớ các bit được dịch sang byte phía sau
+//			unsigned char temp = (num.m_bits[i] << (CHAR_BIT - shift)) >> (CHAR_BIT - shift);
+//			// dịch byte hiện tại
+//			num.m_bits[i] >>= shift;
+//			num.m_bits[i] |= carry << (CHAR_BIT - shift);
+//			carry = temp;
+//		}
+//	}
+//
+//	return num;
+//}
 
 // HÀM >> và << NHẬT CODE
 char Nho_Bit_Dich_Phai(char a, int shift) {
