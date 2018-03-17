@@ -12,6 +12,22 @@ void main()
 	bool error = false;
 	const int N = 10000;
 
+	// test 4 toán tử &, |, ^, ~
+	static std::uniform_int_distribution<int> uid(1, 128);
+
+	std::string dec_string1("-256");
+	std::string dec_string2("256");
+
+	BigInt int1 = BigInt(dec_string1);
+	BigInt int2 = BigInt(dec_string2);
+
+	BigInt result_int = int1 + int2;
+
+	std::cout << int1 << std::endl;
+	std::cout << int2 << std::endl;
+	std::cout << result_int << std::endl;
+	//std::cout << ~int1 << std::endl;
+
 
 	// test khởi tạo
 	//std::string dec_string("-1234567891234567891234567891234567891");		// 38 digits
