@@ -31,9 +31,27 @@ void basicTest01(std::ostream &os)
 	(BigInt(dec2IntStr(std::to_string(pow(2, 126)))) << 1).ShowBit(os); os << '\n';
 }
 
+void basicTest02(std::ostream &os) 
+{
+	os << BigInt("256") - BigInt("128") << '\n';
+	os << BigInt("128") - BigInt("256") << '\n';
+	os << BigInt("256") - BigInt("0") << '\n';
+	os << BigInt("0") - BigInt("256") << '\n';
+	os << BigInt("128") - BigInt("-128") << '\n';
+	os << BigInt(BigIntMIN) - BigInt("-1") << '\n';
+	os << BigInt(BigIntMIN) - BigInt("1") << '\n';
+
+	(BigInt("256") - BigInt("128")).ShowBit(os); os << '\n';
+	(BigInt("128") - BigInt("256")).ShowBit(os); os << '\n';
+	(BigInt("256") - BigInt("0")).ShowBit(os); os << '\n';
+	(BigInt("0") - BigInt("256")).ShowBit(os); os << '\n';
+	(BigInt("128") - BigInt("-128")).ShowBit(os); os << '\n';
+	(BigInt(BigIntMIN) - BigInt("-1")).ShowBit(os); os << '\n';
+	(BigInt(BigIntMIN) - BigInt("1")).ShowBit(os); os << '\n';
+}
 void main()
 {
 	std::ofstream outFile(OUTPUT);
-	basicTest01(outFile);
+	basicTest02(outFile);
 	outFile.close();
 }
