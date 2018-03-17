@@ -395,7 +395,7 @@ BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
 	BigInt Bu_2;
 
 	// Bù 1 của số rhs
-	for (int i = 0; i < MAX_BYTES - 1; i++) {
+	for (int i = 0; i < MAX_BYTES; i++) {
 		Bu_2.m_bits[i] = ~(rhs.m_bits[i]);
 	}
 
