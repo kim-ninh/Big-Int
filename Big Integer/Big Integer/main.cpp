@@ -49,9 +49,100 @@ void basicTest02(std::ostream &os)
 	(BigInt(BigIntMIN) - BigInt("-1")).ShowBit(os); os << '\n';
 	(BigInt(BigIntMIN) - BigInt("1")).ShowBit(os); os << '\n';
 }
+
+void Test(std::istream &is, std::ostream &os)
+{
+	char ToanTu;
+	int n;
+	std::string lhs, rhs;
+	is >> ToanTu;
+	is >> n;
+	switch (ToanTu)
+	{
+	case '+':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			//os << (BigInt(lhs) + BigInt(rhs)) << '\n';
+			(BigInt(lhs) + BigInt(rhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	case '-':	
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			//os << (BigInt(lhs) - BigInt(rhs)) << '\n';
+			(BigInt(lhs) - BigInt(rhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	case '*':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			//os << (BigInt(lhs) * BigInt(rhs)) << '\n';
+			(BigInt(lhs) * BigInt(rhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	case '/':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			try {
+				//os << (BigInt(lhs) / BigInt(rhs)) << '\n';
+				(BigInt(lhs) / BigInt(rhs)).ShowBit(os); os << '\n';
+			}
+			catch (std::exception &e) {
+				os << e.what() << '\n';
+			}
+			
+		}
+		break;
+	case '&':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			//os << (BigInt(lhs) & BigInt(rhs)) << '\n';
+			(BigInt(lhs) & BigInt(rhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	case '|':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			//os << (BigInt(lhs) | BigInt(rhs)) << '\n';
+			(BigInt(lhs) | BigInt(rhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	case '^':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs >> rhs;
+			//os << (BigInt(lhs) ^ BigInt(rhs)) << '\n';
+			(BigInt(lhs) ^ BigInt(rhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	case '~':
+		for(int i = 0; i < n; i++)
+		{
+			is >> lhs;
+			//os << (~BigInt(lhs)) << '\n';
+			(~BigInt(lhs)).ShowBit(os); os << '\n';
+		}
+		break;
+	}
+}
+
 void main()
 {
-	std::ofstream outFile(OUTPUT);
-	basicTest02(outFile);
-	outFile.close();
+	std::ofstream outFile;
+	std::ifstream inFile;
+
+	for (int i = 1; i <= 6; i++)
+	{
+		inFile.open(std::string("in_") + std::to_string(i) + std::string(".txt"));
+		outFile.open(std::string("out_") + std::to_string(i) + std::string(".txt"));
+		Test(inFile, outFile);
+		inFile.close();
+		outFile.close();
+	}
 }

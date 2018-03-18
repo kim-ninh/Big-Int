@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <regex>
 #include <bitset>
+#include <exception>
 
 #define MAX_BYTES 16
 #define BigIntMAX  "170141183460469231731687303715884105727"		// 2^127 - 1
