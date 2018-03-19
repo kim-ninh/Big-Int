@@ -63,24 +63,30 @@ void Test(std::istream &is, std::ostream &os)
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			//os << (BigInt(lhs) + BigInt(rhs)) << '\n';
-			(BigInt(lhs) + BigInt(rhs)).ShowBit(os); os << '\n';
+			os << (BigInt(lhs) + BigInt(rhs)) << '\n';
+			//(BigInt(lhs) + BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '-':	
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			//os << (BigInt(lhs) - BigInt(rhs)) << '\n';
-			(BigInt(lhs) - BigInt(rhs)).ShowBit(os); os << '\n';
+			os << (BigInt(lhs) - BigInt(rhs)) << '\n';
+			//(BigInt(lhs) - BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '*':
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			//os << (BigInt(lhs) * BigInt(rhs)) << '\n';
-			(BigInt(lhs) * BigInt(rhs)).ShowBit(os); os << '\n';
+			try {
+				os << (BigInt(lhs) * BigInt(rhs)) << '\n';
+				//(BigInt(lhs) * BigInt(rhs)).ShowBit(os); os << '\n';
+			}
+			catch (std::exception &e) {
+				os << e.what() << '\n';
+			}
+			
 		}
 		break;
 	case '/':
@@ -88,8 +94,8 @@ void Test(std::istream &is, std::ostream &os)
 		{
 			is >> lhs >> rhs;
 			try {
-				//os << (BigInt(lhs) / BigInt(rhs)) << '\n';
-				(BigInt(lhs) / BigInt(rhs)).ShowBit(os); os << '\n';
+				os << (BigInt(lhs) / BigInt(rhs)) << '\n';
+				//(BigInt(lhs) / BigInt(rhs)).ShowBit(os); os << '\n';
 			}
 			catch (std::exception &e) {
 				os << e.what() << '\n';
@@ -101,32 +107,32 @@ void Test(std::istream &is, std::ostream &os)
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			//os << (BigInt(lhs) & BigInt(rhs)) << '\n';
-			(BigInt(lhs) & BigInt(rhs)).ShowBit(os); os << '\n';
+			os << (BigInt(lhs) & BigInt(rhs)) << '\n';
+			//(BigInt(lhs) & BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '|':
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			//os << (BigInt(lhs) | BigInt(rhs)) << '\n';
-			(BigInt(lhs) | BigInt(rhs)).ShowBit(os); os << '\n';
+			os << (BigInt(lhs) | BigInt(rhs)) << '\n';
+			//(BigInt(lhs) | BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '^':
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			//os << (BigInt(lhs) ^ BigInt(rhs)) << '\n';
-			(BigInt(lhs) ^ BigInt(rhs)).ShowBit(os); os << '\n';
+			os << (BigInt(lhs) ^ BigInt(rhs)) << '\n';
+			//(BigInt(lhs) ^ BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '~':
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs;
-			//os << (~BigInt(lhs)) << '\n';
-			(~BigInt(lhs)).ShowBit(os); os << '\n';
+			os << (~BigInt(lhs)) << '\n';
+			//(~BigInt(lhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	}

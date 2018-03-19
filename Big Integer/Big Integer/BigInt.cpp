@@ -478,6 +478,44 @@ BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
 	return kq;
 }
 
+BigInt operator*(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt A, M, Q;
+	M = lhs;
+	Q = rhs;
+	for (int i = 0; i < MAX_BYTES; i++)
+		A.m_bits[i] = 0;
+	int k = MAX_BYTES * 8;
+	char Q_1, Q_0;
+	while (k)
+	{
+		//Lấy 2 bit cuối Q_0, Q_1
+		Q_1 = k == MAX_BYTES * 8 ? 0 : Q_0;
+		Q_0 = Q.m_bits[0] & 1;
+
+		if (Q_0 == 1 && Q_1 == 0)
+			A = A - M;
+		else if (Q_0 == 0 && Q_1 == 1)
+			A = A + M;
+
+		//Dịch phải mảng bit [A, Q, Q_1]
+		unsigned char lsbA = A.m_bits[0] & 1;
+		A = A >> 1;
+		Q = Q >> 1;
+		if (lsbA == 1)
+			Q.m_bits[MAX_BYTES - 1] = Q.m_bits[MAX_BYTES - 1] | (1 << 7); //  bật bit nhớ
+		else
+			Q.m_bits[MAX_BYTES - 1] = Q.m_bits[MAX_BYTES - 1] & (~(1 << 7)); // tắt bit nhớ
+		k--;
+	}
+
+	// Nếu A khác 0 hoặc A khác -1 thì kết quả nhân tràn số
+	for (int i = 0; i < MAX_BYTES - 1; i++)
+		if (A.m_bits[i] != A.m_bits[i + 1])
+			throw std::overflow_error("Overflow!");
+	return Q;
+}
+
 // toán tử &
 BigInt operator&(const BigInt & lhs, const BigInt & rhs)
 {
