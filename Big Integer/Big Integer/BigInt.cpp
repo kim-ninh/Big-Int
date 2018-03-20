@@ -254,6 +254,170 @@ std::ostream& operator<<(std::ostream& outDev, const BigInt& num)
 	return outDev;
 }
 
+BigInt operator>>(BigInt num, int shift)	// Phú code
+{
+	unsigned char carry = 0x00;
+	unsigned char fill_value = 0x00;
+	const bool negative = num.m_bits[MAX_BYTES - 1] >> 7;		// kiểm tra số âm
+
+	const int n_byte_shift = shift / CHAR_BIT;
+	shift %= 8;
+
+	if (negative)
+	{
+		carry = (0x7f >> (7 - shift)) & 0xff;		// carry = 
+		fill_value = UCHAR_MAX;
+	}
+
+	// dịch shift/8 đơn vị byte
+	if (n_byte_shift > 0)
+	{
+		memcpy(num.m_bits, num.m_bits + n_byte_shift, (MAX_BYTES - n_byte_shift) * sizeof(char));
+		memset(num.m_bits + MAX_BYTES - n_byte_shift, fill_value, n_byte_shift * sizeof(char));
+	}
+
+	// dịch (shift % 8) đơn vị bit
+	if (shift > 0)
+	{
+		for (int i = MAX_BYTES - 1; i >= 0; --i)
+		{
+			// nhớ các bit được dịch sang byte phía sau
+			unsigned char temp = (num.m_bits[i] << (CHAR_BIT - shift)) >> (CHAR_BIT - shift);
+			// dịch byte hiện tại
+			num.m_bits[i] >>= shift;
+			num.m_bits[i] |= carry << (CHAR_BIT - shift);
+			carry = temp;
+		}
+	}
+
+	return num;
+}
+
+// HÀM >> và << NHẬT CODE
+char Nho_Bit_Dich_Phai(char a, int shift) {
+	char tmp = 0;
+	int t = 0, s = shift;
+	while (shift != t) {
+		tmp = (tmp << 1);
+		tmp = tmp | ((a >> (s - 1)) & 1);
+		s--; t++;
+	}
+	return (tmp << (8 - shift));
+}
+BigInt operator >> (BigInt num, int shift) {
+	while (shift > 8) {
+		char tmp = Nho_Bit_Dich_Phai(num.m_bits[MAX_BYTES - 1], 8);
+
+		if ((num.m_bits[MAX_BYTES - 1] >> 7) & 1 == 1) {
+			int d = 8;
+			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> 8;
+			while (1) {
+				if (d <= 0)break;
+				num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] | (1 << (8 - d));
+				d--;
+			}
+		}
+		else {
+			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> 8;
+		}
+		for (int i = MAX_BYTES - 2; i >= 0; i--) {
+			char nho_byte_truoc = num.m_bits[i];
+			num.m_bits[i] = (num.m_bits[i] >> 8) | tmp;
+			tmp = Nho_Bit_Dich_Phai(nho_byte_truoc, 8);
+		}
+		shift -= 8;
+	}
+
+	char tmp = Nho_Bit_Dich_Phai(num.m_bits[MAX_BYTES - 1], shift);
+	if ((num.m_bits[MAX_BYTES - 1] >> 7) & 1 == 1) {
+		int d = shift;
+		num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> shift;
+		while (1) {
+			if (d <= 0)break;
+			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] | (1 << (8 - d));
+			d--;
+		}
+	}
+	else {
+		num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> shift;
+	}
+	for (int i = MAX_BYTES - 2; i >= 0; i--) {
+		char nho_byte_truoc = num.m_bits[i];
+		num.m_bits[i] = (num.m_bits[i] >> shift) | tmp;
+		tmp = Nho_Bit_Dich_Phai(nho_byte_truoc, shift);
+	}
+	return num;
+}
+
+
+
+char Nho_Bit_Dich_Trai(char a, int shift)
+{
+	char tmp = 0;
+	int t = 0, s = 7;
+	while (shift != t) {
+		tmp = tmp << 1;
+		tmp = tmp | (a >> (s) & 1);
+		s--; t++;
+	}
+	return tmp;
+}
+BigInt operator << (BigInt num, int shift)
+{
+
+	while (shift > 8) {
+		char tmp = 0;
+		int i = MAX_BYTES - 2;
+		for (; i >= 0; i--)
+		{
+			tmp = Nho_Bit_Dich_Trai(num.m_bits[i], 8);
+			num.m_bits[i + 1] = (num.m_bits[i + 1] << 8) | tmp;
+		}
+		num.m_bits[0] = num.m_bits[0] << 8;
+		shift -= 8;
+	}
+	char tmp = 0;
+	int i = MAX_BYTES - 2;
+	for (; i >= 0; i--)
+	{
+		tmp = Nho_Bit_Dich_Trai(num.m_bits[i], shift);
+		num.m_bits[i + 1] = (num.m_bits[i + 1] << shift) | tmp;
+	}
+	num.m_bits[0] = num.m_bits[0] << shift;
+	return num;
+}
+
+BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
+{
+	BigInt kq;
+	using WORD = unsigned short;
+	using BYTE = unsigned char;
+	BigInt Bu_2;
+
+	// Bù 1 của số rhs
+	for (int i = 0; i < MAX_BYTES; i++) {
+		Bu_2.m_bits[i] = ~(rhs.m_bits[i]);
+	}
+
+	// Bù 2 = Bù 1 + 1 của số rhs
+	BYTE Nho = 1;
+	for (int i = 0; i <MAX_BYTES; i++) {
+		WORD tmp1 = Bu_2.m_bits[i] + Nho;
+		Bu_2.m_bits[i] = tmp1;
+		Nho = tmp1 / (UCHAR_MAX + 1);
+	}
+
+
+	// Cộng lsh với bù 2 của rhs
+	BYTE carry = 0x00;
+	for (int i = 0; i <MAX_BYTES; i++) {
+		WORD tmp2 = lhs.m_bits[i] + Bu_2.m_bits[i] + carry;
+		kq.m_bits[i] = tmp2;
+		carry = tmp2 / (UCHAR_MAX + 1);
+	}
+	return kq;
+}
+
 /*
 Hàm chia 2 số BigInt với nhau
 Có sử dụng đến toán tử dịch bit (<<) và toán tử (-) trong thuật toán

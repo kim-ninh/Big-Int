@@ -38,8 +38,8 @@ public:
 	friend BigInt operator ^ (const BigInt& lhs, const BigInt& rhs);
 	friend BigInt operator ~ (const BigInt& lhs);
 
-	BigInt operator << (int shift);
-	BigInt operator >> (int shift);
+	friend BigInt operator << (BigInt num, int shift);
+	friend BigInt operator >> (BigInt num, int shift);
 
 	//test
 	void ShowBit() const;
