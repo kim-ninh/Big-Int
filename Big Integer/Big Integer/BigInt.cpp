@@ -280,40 +280,42 @@ BigInt operator/(const BigInt & lhs, const BigInt & rhs)
 	Q = lhs;
 	M = rhs;
 
-	//Xác định Q âm hay dương
-	if ((Q.m_bits[MAX_BYTES - 1] >> 7) & 1)
-	{
-		for (int i = 0; i < MAX_BYTES; i++)
-			A.m_bits[i] = 0xFF;
-	}	
-	else
-	{
-		for (int i = 0; i < MAX_BYTES; i++)
-			A.m_bits[i] = 0;
-	}
+	if (Q.m_bits[MAX_BYTES - 1] >> 7)
+		Q = BigInt("0") - Q;
+
+	if (M.m_bits[MAX_BYTES - 1] >> 7)
+		M = BigInt("0") - M;
+
+	for (int i = 0; i < MAX_BYTES; i++)
+		A.m_bits[i] = 0;
 
 	while (k)
 	{
 		//Dịch trái từng bit trên mảng bit [A, Q]
 		unsigned char msbQ = Q.m_bits[MAX_BYTES - 1] >> 7;
-		A << 1;
+		A = A << 1;
 		A.m_bits[0] = A.m_bits[0] | msbQ;
-		Q << 1;
+		Q = Q << 1;
 
-		//KT A âm hay dương
 		A = A - M;
 		if ((A.m_bits[MAX_BYTES - 1] >> 7) & 1)
 		{
-			Q.m_bits[0] = Q.m_bits[0] & (~1);	//Tắt bit 0 (Q0 = 0)
 			A = A + M;
 		}
 		else
 			Q.m_bits[0] = Q.m_bits[0] | 1;		//Bật bit 0 (Q0 = 1)
+
 		k--;
 	}
+
+	//Nếu số chia và số bị chia khác dấu, đổi dấu thương
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) != (rhs.m_bits[MAX_BYTES - 1] >> 7))
+		return BigInt("0") - Q;
 	return Q;
 }
 
+//Hàm chia lấy phần dư tương tự chia nguyên
+//Kết quả trả về là BigInt A thay vì BigInt Q
 BigInt operator%(const BigInt & lhs, const BigInt & rhs)
 {
 	bool isZero = true;
@@ -333,37 +335,37 @@ BigInt operator%(const BigInt & lhs, const BigInt & rhs)
 	Q = lhs;
 	M = rhs;
 
-	//Xác định Q âm hay dương
-	if ((Q.m_bits[MAX_BYTES - 1] >> 7) & 1)
-	{
-		for (int i = 0; i < MAX_BYTES; i++)
-			A.m_bits[i] = 0xFF;
-	}
-	else
-	{
-		for (int i = 0; i < MAX_BYTES; i++)
-			A.m_bits[i] = 0;
-	}
+	if (Q.m_bits[MAX_BYTES - 1] >> 7)
+		Q = BigInt("0") - Q;
+
+	if (M.m_bits[MAX_BYTES - 1] >> 7)
+		M = BigInt("0") - M;
+
+	for (int i = 0; i < MAX_BYTES; i++)
+		A.m_bits[i] = 0;
 
 	while (k)
 	{
 		//Dịch trái từng bit trên mảng bit [A, Q]
 		unsigned char msbQ = Q.m_bits[MAX_BYTES - 1] >> 7;
-		A << 1;
+		A = A << 1;
 		A.m_bits[0] = A.m_bits[0] | msbQ;
-		Q << 1;
+		Q = Q << 1;
 
-		//KT A âm hay dương
 		A = A - M;
 		if ((A.m_bits[MAX_BYTES - 1] >> 7) & 1)
 		{
-			Q.m_bits[0] = Q.m_bits[0] & (~1);	//Tắt bit 0 (Q0 = 0)
 			A = A + M;
 		}
 		else
 			Q.m_bits[0] = Q.m_bits[0] | 1;		//Bật bit 0 (Q0 = 1)
+
 		k--;
 	}
+
+	//Nếu số chia và số bị chia khác dấu, đổi dấu phần dư
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) != (rhs.m_bits[MAX_BYTES - 1] >> 7))
+		return BigInt("0") - A;
 	return A;
 }
 
