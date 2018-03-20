@@ -7,7 +7,7 @@
  * 
  * @dec_string chuỗi ký tự chứa số nguyên lớn
  */
-void BigInt::set_bit(std::string dec_string)
+void BigInt::set_bit(std::string&& dec_string)
 {
 	// kiểm tra tham số
 	const std::regex r("\\-?[[:digit:]]+");
@@ -59,12 +59,12 @@ void BigInt::set_bit(std::string dec_string)
 	// bù 2 nếu số âm
 	if (negative)
 	{
-		unsigned char carry = 1;
+		BYTE carry = 1;
 		// đảo tất cả các bit & cộng 1
 		std::for_each(std::begin(m_bits), std::end(m_bits),
-			[&carry](unsigned char& byte) -> void
+			[&carry](BYTE& byte) -> void
 		{
-			unsigned char temp = byte ^ UCHAR_MAX;
+			BYTE temp = byte ^ UCHAR_MAX;
 			byte = temp + carry;
 			carry = temp == UCHAR_MAX && carry == 1 ? 1 : 0;
 		});
@@ -96,7 +96,7 @@ std::string BigInt::get_dec_string() const
 
 	for (int i = MAX_BYTES - 2; i >= 0; --i)
 	{
-		const auto byte_value = static_cast<unsigned char>(m_bits[i]);
+		const auto byte_value = static_cast<BYTE>(m_bits[i]);
 		std::string temp = std::to_string(byte_value*pow(2, 8 * i));
 		res = add_dec_string(res, temp.substr(0, temp.length() - 7));
 	}
@@ -227,22 +227,82 @@ std::string BigInt::add_dec_string(std::string dec_string1, std::string dec_stri
 	}
 }
 
-BigInt::BigInt(std::string dec_string)
+BigInt::BigInt(const std::string& dec_string)
 {
-	set_bit(dec_string);
+	set_bit(std::string(dec_string));
+}
+
+BigInt::BigInt(std::string&& dec_string)
+{
+	set_bit(std::move(dec_string));
+}
+
+BigInt::BigInt(const char* dec_string) : BigInt(std::string(dec_string)) {}
+
+bool BigInt::operator!=(const BigInt& other) const
+{
+	for (int i = 0; i < MAX_BYTES; ++i)
+	{
+		if (this->m_bits[i] != other.m_bits[i])
+			return true;
+	}
+
+	return false;
+}
+
+
+bool BigInt::operator==(const BigInt& other) const
+{
+	for (int i = 0; i < MAX_BYTES; ++i)
+	{
+		if (this->m_bits[i] != other.m_bits[i])
+			return false;
+	}
+
+	return true;
 }
 
 void BigInt::ShowBit() const
 {  
 	for (int i = MAX_BYTES - 1; i >= 0; --i)
-		std::cout << std::bitset<8>(*const_cast<unsigned char*>(m_bits + i)) << "  ";
+		std::cout << std::bitset<8>(*const_cast<BYTE*>(m_bits + i)) << "  ";
+}
+
+std::string DecToBin(BigInt num)
+{
+	return std::string();
+}
+
+BigInt BinToDec(const std::string& bin_string)
+{
+	return std::string();
+}
+
+std::string DecToHex(BigInt num)
+{
+	return std::string();
+}
+
+BigInt HexToDec(const std::string& hex_string)
+{
+	return std::string();
+}
+
+std::string BinToHex(const std::string& hex_string)
+{
+	return std::string();
+}
+
+std::string HexToBin(const std::string& bin_string)
+{
+	return std::string();
 }
 
 std::istream& operator>>(std::istream& inDev, BigInt& num)
 {
 	std::string dec_string;
 	inDev >> dec_string;
-	num.set_bit(dec_string);
+	num.set_bit(std::move(dec_string));
 
 	return inDev;
 }
@@ -254,10 +314,10 @@ std::ostream& operator<<(std::ostream& outDev, const BigInt& num)
 	return outDev;
 }
 
-BigInt operator>>(BigInt num, int shift)	// Phú code
+BigInt operator>>(BigInt num, int shift)
 {
-	unsigned char carry = 0x00;
-	unsigned char fill_value = 0x00;
+	BYTE carry = 0x00;
+	BYTE fill_value = 0x00;
 	const bool negative = num.m_bits[MAX_BYTES - 1] >> 7;		// kiểm tra số âm
 
 	const int n_byte_shift = shift / CHAR_BIT;
@@ -282,7 +342,7 @@ BigInt operator>>(BigInt num, int shift)	// Phú code
 		for (int i = MAX_BYTES - 1; i >= 0; --i)
 		{
 			// nhớ các bit được dịch sang byte phía sau
-			unsigned char temp = (num.m_bits[i] << (CHAR_BIT - shift)) >> (CHAR_BIT - shift);
+			BYTE temp = (num.m_bits[i] << (CHAR_BIT - shift)) >> (CHAR_BIT - shift);
 			// dịch byte hiện tại
 			num.m_bits[i] >>= shift;
 			num.m_bits[i] |= carry << (CHAR_BIT - shift);
@@ -293,63 +353,10 @@ BigInt operator>>(BigInt num, int shift)	// Phú code
 	return num;
 }
 
-// HÀM >> và << NHẬT CODE
-char Nho_Bit_Dich_Phai(char a, int shift) {
-	char tmp = 0;
-	int t = 0, s = shift;
-	while (shift != t) {
-		tmp = (tmp << 1);
-		tmp = tmp | ((a >> (s - 1)) & 1);
-		s--; t++;
-	}
-	return (tmp << (8 - shift));
+std::string to_string(const BigInt& num)
+{
+	return num.get_dec_string();
 }
-BigInt operator >> (BigInt num, int shift) {
-	while (shift > 8) {
-		char tmp = Nho_Bit_Dich_Phai(num.m_bits[MAX_BYTES - 1], 8);
-
-		if ((num.m_bits[MAX_BYTES - 1] >> 7) & 1 == 1) {
-			int d = 8;
-			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> 8;
-			while (1) {
-				if (d <= 0)break;
-				num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] | (1 << (8 - d));
-				d--;
-			}
-		}
-		else {
-			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> 8;
-		}
-		for (int i = MAX_BYTES - 2; i >= 0; i--) {
-			char nho_byte_truoc = num.m_bits[i];
-			num.m_bits[i] = (num.m_bits[i] >> 8) | tmp;
-			tmp = Nho_Bit_Dich_Phai(nho_byte_truoc, 8);
-		}
-		shift -= 8;
-	}
-
-	char tmp = Nho_Bit_Dich_Phai(num.m_bits[MAX_BYTES - 1], shift);
-	if ((num.m_bits[MAX_BYTES - 1] >> 7) & 1 == 1) {
-		int d = shift;
-		num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> shift;
-		while (1) {
-			if (d <= 0)break;
-			num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] | (1 << (8 - d));
-			d--;
-		}
-	}
-	else {
-		num.m_bits[MAX_BYTES - 1] = num.m_bits[MAX_BYTES - 1] >> shift;
-	}
-	for (int i = MAX_BYTES - 2; i >= 0; i--) {
-		char nho_byte_truoc = num.m_bits[i];
-		num.m_bits[i] = (num.m_bits[i] >> shift) | tmp;
-		tmp = Nho_Bit_Dich_Phai(nho_byte_truoc, shift);
-	}
-	return num;
-}
-
-
 
 char Nho_Bit_Dich_Trai(char a, int shift)
 {
@@ -387,11 +394,28 @@ BigInt operator << (BigInt num, int shift)
 	return num;
 }
 
+BigInt operator+(const BigInt & lhs, const BigInt & rhs)
+{
+	bool carry = 0; // bit nhớ, mặc định là 0.
+	BigInt result_int;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		WORD temp_num; // lưu tạm kết quả cộng cặp byte thứ i.
+		temp_num = lhs.m_bits[i] + rhs.m_bits[i] + carry; // cộng thêm bit nhớ nếu có.
+		carry = 0; // cộng xong thì trả lại 0.
+
+		if (temp_num > 255) // tổng vượt quá giới hạn của uchar thì bật bit nhớ.
+		{
+			carry = 1;
+		}
+		result_int.m_bits[i] = temp_num; // gán kết quả cuối.
+	}
+	return result_int;
+}
+
 BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
 {
 	BigInt kq;
-	using WORD = unsigned short;
-	using BYTE = unsigned char;
 	BigInt Bu_2;
 
 	// Bù 1 của số rhs
@@ -416,4 +440,201 @@ BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
 		carry = tmp2 / (UCHAR_MAX + 1);
 	}
 	return kq;
+}
+
+/*
+Hàm chia 2 số BigInt với nhau
+Có sử dụng đến toán tử dịch bit (<<) và toán tử (-) trong thuật toán
+Kiểu trả về là Bigint
+Thực hiện phép tính: Q / M, kết quả trả về lưu trong biến Q
+*/
+
+BigInt operator/(const BigInt & lhs, const BigInt & rhs)
+{
+	bool isZero = true;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		if (rhs.m_bits[i] != 0)
+		{
+			isZero = false;
+			break;
+		}
+	}
+	if (isZero)
+		throw std::invalid_argument("Can't divide by zero");
+
+	BigInt A, Q, M;
+	int k = MAX_BYTES * 8;
+	Q = lhs;
+	M = rhs;
+
+	if (Q.m_bits[MAX_BYTES - 1] >> 7)
+		Q = BigInt("0") - Q;
+
+	if (M.m_bits[MAX_BYTES - 1] >> 7)
+		M = BigInt("0") - M;
+
+	for (int i = 0; i < MAX_BYTES; i++)
+		A.m_bits[i] = 0;
+
+	while (k)
+	{
+		//Dịch trái từng bit trên mảng bit [A, Q]
+		unsigned char msbQ = Q.m_bits[MAX_BYTES - 1] >> 7;
+		A = A << 1;
+		A.m_bits[0] = A.m_bits[0] | msbQ;
+		Q = Q << 1;
+
+		A = A - M;
+		if ((A.m_bits[MAX_BYTES - 1] >> 7) & 1)
+		{
+			A = A + M;
+		}
+		else
+			Q.m_bits[0] = Q.m_bits[0] | 1;		//Bật bit 0 (Q0 = 1)
+
+		k--;
+	}
+
+	//Nếu số chia và số bị chia khác dấu, đổi dấu thương
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) != (rhs.m_bits[MAX_BYTES - 1] >> 7))
+		return BigInt("0") - Q;
+	return Q;
+}
+
+//Hàm chia lấy phần dư tương tự chia nguyên
+//Kết quả trả về là BigInt A thay vì BigInt Q
+BigInt operator%(const BigInt & lhs, const BigInt & rhs)
+{
+	bool isZero = true;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		if (rhs.m_bits[i] != 0)
+		{
+			isZero = false;
+			break;
+		}
+	}
+	if (isZero)
+		throw std::invalid_argument("Can't divide by zero");
+
+	BigInt A, Q, M;
+	int k = MAX_BYTES * 8;
+	Q = lhs;
+	M = rhs;
+
+	if (Q.m_bits[MAX_BYTES - 1] >> 7)
+		Q = BigInt("0") - Q;
+
+	if (M.m_bits[MAX_BYTES - 1] >> 7)
+		M = BigInt("0") - M;
+
+	for (int i = 0; i < MAX_BYTES; i++)
+		A.m_bits[i] = 0;
+
+	while (k)
+	{
+		//Dịch trái từng bit trên mảng bit [A, Q]
+		unsigned char msbQ = Q.m_bits[MAX_BYTES - 1] >> 7;
+		A = A << 1;
+		A.m_bits[0] = A.m_bits[0] | msbQ;
+		Q = Q << 1;
+
+		A = A - M;
+		if ((A.m_bits[MAX_BYTES - 1] >> 7) & 1)
+		{
+			A = A + M;
+		}
+		else
+			Q.m_bits[0] = Q.m_bits[0] | 1;		//Bật bit 0 (Q0 = 1)
+
+		k--;
+	}
+
+	//Nếu số chia và số bị chia khác dấu, đổi dấu phần dư
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) != (rhs.m_bits[MAX_BYTES - 1] >> 7))
+		return BigInt("0") - A;
+	return A;
+}
+
+BigInt operator*(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt A, M, Q;
+	M = lhs;
+	Q = rhs;
+	for (int i = 0; i < MAX_BYTES; i++)
+		A.m_bits[i] = 0;
+	int k = MAX_BYTES * 8;
+	char Q_1, Q_0;
+	while (k)
+	{
+		//Lấy 2 bit cuối Q_0, Q_1
+		Q_1 = k == MAX_BYTES * 8 ? 0 : Q_0;
+		Q_0 = Q.m_bits[0] & 1;
+
+		if (Q_0 == 1 && Q_1 == 0)
+			A = A - M;
+		else if (Q_0 == 0 && Q_1 == 1)
+			A = A + M;
+
+		//Dịch phải mảng bit [A, Q, Q_1]
+		unsigned char lsbA = A.m_bits[0] & 1;
+		A = A >> 1;
+		Q = Q >> 1;
+		if (lsbA == 1)
+			Q.m_bits[MAX_BYTES - 1] = Q.m_bits[MAX_BYTES - 1] | (1 << 7); //  bật bit nhớ
+		else
+			Q.m_bits[MAX_BYTES - 1] = Q.m_bits[MAX_BYTES - 1] & (~(1 << 7)); // tắt bit nhớ
+		k--;
+	}
+
+	// Nếu A khác 0 hoặc A khác -1 thì kết quả nhân tràn số
+	for (int i = 0; i < MAX_BYTES - 1; i++)
+		if (A.m_bits[i] != A.m_bits[i + 1])
+			throw std::overflow_error("Overflow!");
+	return Q;
+}
+
+// toán tử &
+BigInt operator&(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = lhs.m_bits[i] & rhs.m_bits[i];
+	}
+	return ResultInt;
+}
+
+// toán tử |
+BigInt operator|(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = lhs.m_bits[i] | rhs.m_bits[i];
+	}
+	return ResultInt;
+}
+
+//toán tử ^
+BigInt operator^(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = lhs.m_bits[i] ^ rhs.m_bits[i];
+	}
+	return ResultInt;
+}
+
+//toán tử ~
+BigInt operator~(const BigInt & lhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = ~lhs.m_bits[i];
+	}
+	return ResultInt;
 }
