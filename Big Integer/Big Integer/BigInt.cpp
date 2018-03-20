@@ -254,6 +254,25 @@ std::ostream& operator<<(std::ostream& outDev, const BigInt& num)
 	return outDev;
 }
 
+BigInt operator+(const BigInt & lhs, const BigInt & rhs)
+{
+	bool carry = 0; // bit nhớ, mặc định là 0.
+	BigInt result_int;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		unsigned short temp_num; // lưu tạm kết quả cộng cặp byte thứ i.
+		temp_num = lhs.m_bits[i] + rhs.m_bits[i] + carry; // cộng thêm bit nhớ nếu có.
+		carry = 0; // cộng xong thì trả lại 0.
+
+		if (temp_num > 255) // tổng vượt quá giới hạn của uchar thì bật bit nhớ.
+		{
+			carry = 1;
+		}
+		result_int.m_bits[i] = temp_num; // gán kết quả cuối.
+	}
+	return result_int;
+}
+
 BigInt operator>>(BigInt num, int shift)	// Phú code
 {
 	unsigned char carry = 0x00;
@@ -416,4 +435,48 @@ BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
 		carry = tmp2 / (UCHAR_MAX + 1);
 	}
 	return kq;
+}
+
+// toán tử &
+BigInt operator&(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = lhs.m_bits[i] & rhs.m_bits[i];
+	}
+	return ResultInt;
+}
+
+// toán tử |
+BigInt operator|(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = lhs.m_bits[i] | rhs.m_bits[i];
+	}
+	return ResultInt;
+}
+
+//toán tử ^
+BigInt operator^(const BigInt & lhs, const BigInt & rhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = lhs.m_bits[i] ^ rhs.m_bits[i];
+	}
+	return ResultInt;
+}
+
+//toán tử ~
+BigInt operator~(const BigInt & lhs)
+{
+	BigInt ResultInt;
+	for (int i = 0; i < MAX_BYTES; i++)
+	{
+		ResultInt.m_bits[i] = ~lhs.m_bits[i];
+	}
+	return ResultInt;
 }
