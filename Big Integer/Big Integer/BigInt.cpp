@@ -270,12 +270,49 @@ void BigInt::ShowBit() const
 
 std::string DecToBin(BigInt num)
 {
-	return std::string();
+	std::string bin_string;
+	bin_string.reserve(MAX_BYTES * CHAR_BIT);
+
+	bool negative = to_string(num)[0] == '-' ? true : false; // kiểm tra số âm
+
+	//NOTE: nếu phép %2 k tạo ra tình trạng dư "-1" thì có thể bỏ dòng lệnh dưới
+	if (negative) num = "0" - num; //âm thì đảo dấu
+
+	while (num != "0")
+		{
+			bin_string.insert(0, to_string(num % "2"));
+			num = num / "2";
+		}
+	
+	if (negative) //âm thì xử lý theo bù 2
+	{
+		bin_string.insert(0, MAX_BYTES * CHAR_BIT - bin_string.length(), '0'); //bù bit 0 cho đủ 128 bit
+		for (int i = 0; i < MAX_BYTES * CHAR_BIT; i++) //Đảo bit
+			bin_string[i] = (bin_string[i] == '0') ? '1' : '0';
+		//+1
+		if (bin_string[MAX_BYTES * CHAR_BIT - 1] = '1') //bit cuối == 1
+		{
+			char bit_nho = 1, i = MAX_BYTES * CHAR_BIT - 2;
+			bin_string[MAX_BYTES * CHAR_BIT - 1]--; //về 0 và nhớ 1
+			while (bit_nho == 1)
+			{
+				if (bin_string[i] == '1') bin_string[i]--; //về 0 vẫn nhớ 1
+				else
+				{
+					bin_string[i]++;
+					bit_nho == 0;
+				}
+				i--;
+			}
+		}
+		else bin_string[MAX_BYTES * CHAR_BIT - 1]++;
+	}
+	return bin_string;
 }
 
 BigInt BinToDec(const std::string& bin_string)
 {
-	return std::string();
+		
 }
 
 std::string DecToHex(BigInt num)
@@ -288,14 +325,66 @@ BigInt HexToDec(const std::string& hex_string)
 	return std::string();
 }
 
-std::string BinToHex(const std::string& hex_string)
+std::string BinToHex(const std::string& bin_string)
 {
-	return std::string();
+	//Trường hợp số 0
+	if (bin_string == "0") return "0";
+
+	std::string hex_string;
+	hex_string.reserve(MAX_BYTES*CHAR_BIT / 4);
+	std::string sample("0123456789ABCDEF"); //Mẫu ký tự hex
+
+	char bit_pos = 0, value = 0; //Ý tưởng: Gom nhóm 4 bit thành 1 ký tự hex từ phải sang trái
+
+	while (bit_pos < bin_string.length())
+	{
+		value += (bin_string[bin_string.length() - bit_pos - 1] - '0')*(char)pow(2, bit_pos % 4);
+		if (bit_pos % 4 == 3) //Mỗi 4 bit tiếng hành chuyển thành 1 ký tự hex rồi xóa giá trị nhớ value
+		{
+			hex_string.insert(0, 1, sample[value]);
+			value = 0;
+		}
+		bit_pos++;
+	}
+	if (value != 0) hex_string.insert(0, 1, sample[value]); //Nếu số bit của chuỗi k chia hết cho 4 tức là còn ít hơn 4 bit -> tiếp tục chuyển giá trị nhớ value thành ký tự hex
+	
+	return hex_string;
 }
 
-std::string HexToBin(const std::string& bin_string)
+std::string HexToBin(const std::string& hex_string)
 {
-	return std::string();
+	if (hex_string == "0") return "0";
+
+	std::string bin_string;
+	bin_string.reserve(MAX_BYTES*CHAR_BIT);
+	std::string sample("0123456789ABCDEF"); //mẫu ký tự hex
+
+	char ch_pos = 0, value = 0;
+	while (ch_pos < hex_string.length() - 1)
+	{
+		value = sample.find_first_of(hex_string[hex_string.length() - ch_pos - 1]);
+		
+		char bit_fill = 4; //số bit 0 bù cho đủ nhóm 4-bit
+		while (value !=0)
+		{
+			bin_string.insert(0, 1, value % 2 + '0');
+			value /= 2;
+			bit_fill--;
+		}
+		bin_string.insert(0, bit_fill, '0'); //làm cho đủ 4-bit
+
+		ch_pos++;
+	}
+
+	//xử lý ký tự đầu tiên
+	value = sample.find_first_of(hex_string[0]);
+	while (value != 0)
+	{
+		bin_string.insert(0, 1, value % 2 + '0');
+		value /= 2;
+	}
+
+	return bin_string;
 }
 
 std::istream& operator>>(std::istream& inDev, BigInt& num)
