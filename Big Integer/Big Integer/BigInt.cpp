@@ -268,7 +268,7 @@ void BigInt::ShowBit() const
 		std::cout << std::bitset<8>(*const_cast<BYTE*>(m_bits + i)) << "  ";
 }
 
-std::string DecToBin(BigInt num)
+std::string DecToBin(BigInt num) //Minh Nhật code
 {
 	std::string bin_string;
 	bin_string.reserve(MAX_BYTES * CHAR_BIT);
@@ -310,9 +310,22 @@ std::string DecToBin(BigInt num)
 	return bin_string;
 }
 
-BigInt BinToDec(const std::string& bin_string)
+BigInt BinToDec(const std::string& bin_string)//Văn Nhật code
 {
-		
+	BigInt res("0");
+	std::string temp = "0";
+
+	int j = 0, i;
+	for (i = bin_string.length() - 1; i >= 0; i--) {
+		if (bin_string[i] == '1') {
+			temp = std::to_string(pow(2, j));
+			temp = temp.substr(0, temp.length() - 7);
+			res = res + BigInt(temp);
+		}
+		j++;
+	}
+
+	return res;
 }
 
 std::string DecToHex(BigInt num)
@@ -320,12 +333,46 @@ std::string DecToHex(BigInt num)
 	return std::string();
 }
 
-BigInt HexToDec(const std::string& hex_string)
+BigInt HexToDec(const std::string& hex_string) //Văn Nhật code
 {
-	return std::string();
+	BigInt res("0");
+	std::string temp = "0";
+	int l = hex_string.length() - 1;
+	int i = 0;
+
+	// xử lí khi có dấu âm => k có dấu âm k cần xử lí
+	if (hex_string[0] == '-') {
+		i++;
+		l--;
+	}
+
+	for (; i < hex_string.length(); i++) {
+		if (hex_string[i] >= 'A'&&hex_string[i] <= 'F') {
+			temp = std::to_string(((hex_string[i] - 55) << (4 * l)));
+			res = res + BigInt(temp);
+			l--;
+		}
+		else if (hex_string[i] >= 'a'&&hex_string[i] <= 'f') {
+			temp = std::to_string(((hex_string[i] - 87) << (4 * l)));
+			res = res + BigInt(temp);
+			l--;
+		}
+		else {
+			temp = std::to_string(((hex_string[i] - 48) << (4 * l)));
+			res = res + BigInt(temp);
+			l--;
+		}
+	}
+
+	// nếu số âm thì biểu diễn sang bù 2
+	if (hex_string[0] == '-') {
+		res = ~(res);
+		res = res + BigInt("1");
+	}
+	return res;
 }
 
-std::string BinToHex(const std::string& bin_string)
+std::string BinToHex(const std::string& bin_string) //Minh Nhật code
 {
 	//Trường hợp số 0
 	if (bin_string == "0") return "0";
@@ -351,7 +398,7 @@ std::string BinToHex(const std::string& bin_string)
 	return hex_string;
 }
 
-std::string HexToBin(const std::string& hex_string)
+std::string HexToBin(const std::string& hex_string) //Minh Nhật code
 {
 	if (hex_string == "0") return "0";
 
