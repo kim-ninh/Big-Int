@@ -300,7 +300,7 @@ std::string DecToBin(BigInt num) //Minh Nhật code
 				else
 				{
 					bin_string[i]++;
-					bit_nho == 0;
+					bit_nho = 0;
 				}
 				i--;
 			}
@@ -381,46 +381,6 @@ BigInt HexToDec(const std::string& hex_string) //Văn Nhật code (Cách 1 - X�
 	res = BinToDec(bin_string);
 	return res;
 }*/
-
-
-BigInt HexToDec(const std::string& hex_string)
-{
-	BigInt res("0");
-	std::string temp = "0";
-	int l = hex_string.length() - 1;
-	int i = 0;
-
-	// xử lí khi có dấu âm => k có dấu âm k cần xử lí
-	/*if (hex_string[0] == '-') {
-		i++;
-		l--;
-	}*/
-
-	for (; i < hex_string.length(); i++) {
-		if (hex_string[i] >= 'A'&&hex_string[i] <= 'F') {
-			temp = std::to_string(hex_string[i] - 55);
-			res = res + BigInt(temp << (4 * l));
-			l--;
-		}
-		else if (hex_string[i] >= 'a'&&hex_string[i] <= 'f') {
-			temp = std::to_string(hex_string[i] - 87);
-			res = res + BigInt(temp << (4 * l));
-			l--;
-		}
-		else {
-			temp = std::to_string(hex_string[i] - 48);
-			res = res + BigInt(temp << (4 * l));
-			l--;
-		}
-	}
-
-	// nếu số âm thì biểu diễn sang bù 2
-	/*if (hex_string[0] == '-') {
-		res = ~(res);
-		res = res + BigInt("1");
-	}*/
-	return res;
-}
 
 
 
