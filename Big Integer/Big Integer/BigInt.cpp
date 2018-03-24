@@ -342,34 +342,34 @@ BigInt HexToDec(const std::string& hex_string) //Văn Nhật code
 	int i = 0;
 
 	// xử lí khi có dấu âm => k có dấu âm k cần xử lí
-	if (hex_string[0] == '-') {
-		i++;
-		l--;
-	}
+	/*if (hex_string[0] == '-') {
+	i++;
+	l--;
+	}*/
 
 	for (; i < hex_string.length(); i++) {
 		if (hex_string[i] >= 'A'&&hex_string[i] <= 'F') {
-			temp = std::to_string(((hex_string[i] - 55) << (4 * l)));
-			res = res + BigInt(temp);
+			temp = std::to_string(hex_string[i] - 55);
+			res = res + BigInt(temp << (4 * l));
 			l--;
 		}
 		else if (hex_string[i] >= 'a'&&hex_string[i] <= 'f') {
-			temp = std::to_string(((hex_string[i] - 87) << (4 * l)));
-			res = res + BigInt(temp);
+			temp = std::to_string(hex_string[i] - 87);
+			res = res + BigInt(temp << (4 * l));
 			l--;
 		}
 		else {
-			temp = std::to_string(((hex_string[i] - 48) << (4 * l)));
-			res = res + BigInt(temp);
+			temp = std::to_string(hex_string[i] - 48);
+			res = res + BigInt(temp << (4 * l));
 			l--;
 		}
 	}
 
 	// nếu số âm thì biểu diễn sang bù 2
-	if (hex_string[0] == '-') {
-		res = ~(res);
-		res = res + BigInt("1");
-	}
+	/*if (hex_string[0] == '-') {
+	res = ~(res);
+	res = res + BigInt("1");
+	}*/
 	return res;
 }
 
