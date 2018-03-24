@@ -328,9 +328,10 @@ BigInt BinToDec(const std::string& bin_string)//Văn Nhật code
 	return res;
 }
 
-std::string DecToHex(BigInt num)
+std::string DecToHex(BigInt num) //Minh Nhật code, dùng 2 hàm đã viết: DecToBin() và BinToHex()
 {
-	return std::string();
+	std::string bin_string = DecToBin(num);
+	return BinToHex(bin_string);
 }
 
 BigInt HexToDec(const std::string& hex_string) //Văn Nhật code
