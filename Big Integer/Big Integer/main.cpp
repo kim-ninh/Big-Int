@@ -52,27 +52,96 @@ void basicTest02(std::ostream &os)
 
 void Test(std::istream &is, std::ostream &os)
 {
-	char ToanTu;
+	int ToanTu;
 	int n;
+	short base02;
 	std::string lhs, rhs;
-	is >> ToanTu;
 	is >> n;
+	is >> ToanTu;
 	switch (ToanTu)
 	{
+	case 2:
+		is >> base02;
+		if (base02 == 10)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				is >> lhs;
+				os << BinToDec(lhs) << '\n';
+			}
+		}
+		else if (base02 == 16)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				is >> lhs;
+				os << BinToHex(lhs) << '\n';
+			}
+		}
+		break;
+	case 10:
+		BigInt bI;
+		is >> base02;
+		if (base02 == 2)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				is >> bI;
+				os << DecToBin(bI) << '\n';
+			}
+		}
+		else if (base02 == 16)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				is >> bI;
+				os << DecToHex(bI) << '\n';
+			}
+		}
+		break;
+	case 16:
+		is >> base02;
+		if (base02 == 2)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				is >> lhs;
+				os << HexToBin(lhs) << '\n';
+			}
+		}
+		else if (base02 == 10)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				is >> lhs;
+				os << HexToDec(lhs) << '\n';
+			}
+		}
+		break;
 	case '+':
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			os << (BigInt(lhs) + BigInt(rhs)) << '\n';
-			//(BigInt(lhs) + BigInt(rhs)).ShowBit(os); os << '\n';
+			try
+			{
+				os << (BigInt(lhs) + BigInt(rhs)) << '\n';
+			}
+			catch (std::exception &e) {
+				os << e.what() << '\n';
+			}
 		}
 		break;
 	case '-':	
 		for(int i = 0; i < n; i++)
 		{
 			is >> lhs >> rhs;
-			os << (BigInt(lhs) - BigInt(rhs)) << '\n';
-			//(BigInt(lhs) - BigInt(rhs)).ShowBit(os); os << '\n';
+			try
+			{
+				os << (BigInt(lhs) - BigInt(rhs)) << '\n';
+			}
+			catch (std::exception &e) {
+				os << e.what() << '\n';
+			}
 		}
 		break;
 	case '*':
@@ -81,7 +150,6 @@ void Test(std::istream &is, std::ostream &os)
 			is >> lhs >> rhs;
 			try {
 				os << (BigInt(lhs) * BigInt(rhs)) << '\n';
-				//(BigInt(lhs) * BigInt(rhs)).ShowBit(os); os << '\n';
 			}
 			catch (std::exception &e) {
 				os << e.what() << '\n';
@@ -95,7 +163,6 @@ void Test(std::istream &is, std::ostream &os)
 			is >> lhs >> rhs;
 			try {
 				os << (BigInt(lhs) / BigInt(rhs)) << '\n';
-				//(BigInt(lhs) / BigInt(rhs)).ShowBit(os); os << '\n';
 			}
 			catch (std::exception &e) {
 				os << e.what() << '\n';
@@ -108,7 +175,6 @@ void Test(std::istream &is, std::ostream &os)
 		{
 			is >> lhs >> rhs;
 			os << (BigInt(lhs) & BigInt(rhs)) << '\n';
-			//(BigInt(lhs) & BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '|':
@@ -116,7 +182,6 @@ void Test(std::istream &is, std::ostream &os)
 		{
 			is >> lhs >> rhs;
 			os << (BigInt(lhs) | BigInt(rhs)) << '\n';
-			//(BigInt(lhs) | BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '^':
@@ -124,7 +189,6 @@ void Test(std::istream &is, std::ostream &os)
 		{
 			is >> lhs >> rhs;
 			os << (BigInt(lhs) ^ BigInt(rhs)) << '\n';
-			//(BigInt(lhs) ^ BigInt(rhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	case '~':
@@ -132,18 +196,18 @@ void Test(std::istream &is, std::ostream &os)
 		{
 			is >> lhs;
 			os << (~BigInt(lhs)) << '\n';
-			//(~BigInt(lhs)).ShowBit(os); os << '\n';
 		}
 		break;
 	}
 }
+
 
 void main()
 {
 	std::ofstream outFile;
 	std::ifstream inFile;
 
-	for (int i = 1; i <= 6; i++)
+	for (int i = 7; i <= 12; i++)
 	{
 		inFile.open(std::string("in_") + std::to_string(i) + std::string(".txt"));
 		outFile.open(std::string("out_") + std::to_string(i) + std::string(".txt"));
