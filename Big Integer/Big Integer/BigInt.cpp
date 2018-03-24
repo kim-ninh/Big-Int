@@ -558,6 +558,10 @@ BigInt operator+(const BigInt & lhs, const BigInt & rhs)
 		}
 		result_int.m_bits[i] = temp_num; // gán kết quả cuối.
 	}
+	//nếu 2 số hạng cùng dấu và tổng khác dấu số hạng thì tràn số
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) == (rhs.m_bits[MAX_BYTES - 1] >> 7) &&
+		(rhs.m_bits[MAX_BYTES - 1] >> 7) != (result_int.m_bits[MAX_BYTES - 1] >> 7))
+		throw std::overflow_error("Overflow!");
 	return result_int;
 }
 
@@ -587,6 +591,10 @@ BigInt operator - (const BigInt& lhs, const BigInt& rhs)	// Toán tử -
 		kq.m_bits[i] = tmp2;
 		carry = tmp2 / (UCHAR_MAX + 1);
 	}
+	//nếu 2 số hạng cùng dấu và hiệu khác dấu số hạng thì tràn số
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) != (rhs.m_bits[MAX_BYTES - 1] >> 7) &&
+		(rhs.m_bits[MAX_BYTES - 1] >> 7) == (kq.m_bits[MAX_BYTES - 1] >> 7))
+		throw std::overflow_error("Overflow!");
 	return kq;
 }
 
