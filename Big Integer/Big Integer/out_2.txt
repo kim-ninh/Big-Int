@@ -1,4 +1,4 @@
-Can't divide by zero
+Cannot divide by zero
 0
 2
 0

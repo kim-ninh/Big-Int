@@ -398,6 +398,43 @@ std::string HexToBin(const std::string& hex_string)
 	return bin_string;
 }
 
+std::string ConvertBase(std::string number, int old_base, int new_base)
+{
+	switch (old_base)
+	{
+	case 2:
+		switch (new_base)
+		{
+		case 2:
+			return number;
+		case 10:
+			return BinToDec(number).get_dec_string();
+		case 16:
+			return BinToHex(number);
+		}
+	case 10:
+		switch (new_base)
+		{
+		case 2:
+			return DecToBin(number);
+		case 10:
+			return number;
+		case 16:
+			return DecToHex(number);
+		}
+	case 16:
+		switch (new_base)
+		{
+		case 2:
+			return HexToBin(number);
+		case 10:
+			return HexToDec(number).get_dec_string();
+		case 16:
+			return number;
+		}
+	}
+}
+
 std::istream& operator>>(std::istream& inDev, BigInt& num)
 {
 	std::string dec_string;
@@ -512,9 +549,9 @@ BigInt operator+(const BigInt & lhs, const BigInt & rhs)
 	}
 
 	//nếu 2 số hạng cùng dấu và tổng khác dấu số hạng thì tràn số
-	/*if ((lhs.m_bits[MAX_BYTES - 1] >> 7) == (rhs.m_bits[MAX_BYTES - 1] >> 7) &&
+	if ((lhs.m_bits[MAX_BYTES - 1] >> 7) == (rhs.m_bits[MAX_BYTES - 1] >> 7) &&
 		(rhs.m_bits[MAX_BYTES - 1] >> 7) != (result_int.m_bits[MAX_BYTES - 1] >> 7))
-		throw std::overflow_error("Overflow!");*/
+		throw std::overflow_error("Overflow!");
 	return result_int;
 }
 
@@ -571,7 +608,7 @@ BigInt operator/(const BigInt & lhs, const BigInt & rhs)
 		}
 	}
 	if (isZero)
-		throw std::invalid_argument("Can't divide by zero");
+		throw std::invalid_argument("Cannot divide by zero");
 
 	BigInt A, Q, M;
 	int k = MAX_BYTES * 8;
@@ -626,7 +663,7 @@ BigInt operator%(const BigInt & lhs, const BigInt & rhs)
 		}
 	}
 	if (isZero)
-		throw std::invalid_argument("Can't divide by zero");
+		throw std::invalid_argument("Cannot divide by zero");
 
 	BigInt A, Q, M;
 	int k = MAX_BYTES * 8;
