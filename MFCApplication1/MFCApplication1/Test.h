@@ -8,7 +8,7 @@
 #include <string>
 
 
-void Test(std::istream &is, std::ostream &os);
-BigInt calculate(std::string oprt, const BigInt &n1, const BigInt &n2);
+void Test(std::wifstream& is, std::wofstream& os);
+BigInt calculate(std::wstring oprt, const BigInt &n1, const BigInt &n2);
 
 #endif

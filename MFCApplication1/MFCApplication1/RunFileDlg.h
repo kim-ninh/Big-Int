@@ -31,7 +31,6 @@ public:
 	afx_msg void OnBnClickedOk();
 protected:
 	CString m_input_path;
-	CString m_output_path;
+	CString m_outfile_name;
 public:
-	afx_msg void OnEnChangeMfceditbrowse1();
 };

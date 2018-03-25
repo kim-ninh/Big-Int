@@ -4,7 +4,9 @@
 #include "stdafx.h"
 #include "MFCApplication1.h"
 #include "RunFileDlg.h"
+#include "Test.h"
 #include "afxdialogex.h"
+#include <string>
 
 
 // RunFileDlg dialog
@@ -14,7 +16,7 @@ IMPLEMENT_DYNAMIC(RunFileDlg, CDialogEx)
 RunFileDlg::RunFileDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOG_RUN_FILE)
 	, m_input_path(_T(""))
-	, m_output_path(_T(""))
+	, m_outfile_name(_T(""))
 {
 
 	EnableAutomation();
@@ -39,13 +41,12 @@ void RunFileDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_MFCEDITBROWSE1, m_input_path);
-	DDX_Text(pDX, IDC_EDIT1, m_output_path);
+	DDX_Text(pDX, IDC_EDIT1, m_outfile_name);
 }
 
 
 BEGIN_MESSAGE_MAP(RunFileDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &RunFileDlg::OnBnClickedOk)
-	ON_EN_CHANGE(IDC_MFCEDITBROWSE1, &RunFileDlg::OnEnChangeMfceditbrowse1)
 END_MESSAGE_MAP()
 
 BEGIN_DISPATCH_MAP(RunFileDlg, CDialogEx)
@@ -70,24 +71,12 @@ END_INTERFACE_MAP()
 void RunFileDlg::OnBnClickedOk()
 {
 	UpdateData(TRUE);
-	MessageBox(m_output_path);
+
+	std::wifstream infile{std::wstring(m_input_path)};
+	std::wofstream outfile{std::wstring(m_outfile_name)};
+
+	Test(infile, outfile);
+
 
 	CDialogEx::OnOK();
-}
-
-
-void RunFileDlg::OnEnChangeMfceditbrowse1()
-{
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
-	MessageBox(_T("cai dkm"));
-
-	CFileDialog *pFileDlg = (CFileDialog*)this->GetDlgItem(IDC_MFCEDITBROWSE1);
-	pFileDlg->DoModal();
-
-	MessageBox(pFileDlg->GetPathName());
 }
