@@ -1,4 +1,5 @@
 #pragma once
+#include "afxeditbrowsectrl.h"
 
 
 // RunFileDlg dialog
@@ -33,4 +34,7 @@ protected:
 	CString m_input_path;
 	CString m_outfile_name;
 public:
+	afx_msg void OnEnChangeMfceditbrowse1();
+	CMFCEditBrowseCtrl m_edit_browse;
+	virtual BOOL OnInitDialog();
 };
